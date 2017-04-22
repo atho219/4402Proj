@@ -1,0 +1,29 @@
+#select all comedies
+select distinct movie
+from Movie, Genre_Movie_Xref, Genre
+where Movie.id = movieid and genreid = Genre.id and genre like '%comedy%';
+
+#find bad horror movies
+select movie, avg(rating) AvgRating
+from Movie M
+inner join Genre_Movie_Xref GM on M.id = GM.movieid
+inner join Genre G on G.id = GM.genreid
+inner join Rating_Movie_Xref RM on M.id = RM.movieid
+where G.genre like '%horror%'
+group by movie
+having AvgRating <= 2.5
+order by AvgRating desc;
+
+#find classics
+select movie, year, avg(rating) as AvgRating
+from Movie M, Time_Movie_Xref TM, Time T, Rating_Movie_Xref RM
+where TM.movieid = M.id and T.ID = TM.timeid and RM.movieid=M.id and year < 1980
+group by movie, year
+having AvgRating >= 4
+order by AvgRating desc;
+
+#count ratings per user
+select firstname, lastname, count(ratingmovieid) as NumRatings
+from User_RatingMovie_Xref UR, User U
+where UR.userid = U.id
+group by firstname, lastname;
