@@ -1,7 +1,9 @@
 #select all comedies
 select distinct movie
-from Movie, Genre_Movie_Xref, Genre
-where Movie.id = movieid and genreid = Genre.id and genre like '%comedy%';
+from Movie M
+inner join Genre_Movie_Xref GM on GM.movieid = M.id
+inner join Genre G on G.id = GM.genreid
+where genre like '%comedy%';
 
 #find bad horror movies
 select movie, avg(rating) AvgRating
@@ -11,48 +13,82 @@ inner join Genre G on G.id = GM.genreid
 inner join Rating_Movie_Xref RM on M.id = RM.movieid
 where G.genre like '%horror%'
 group by movie
-having AvgRating <= 2.5
+having AvgRating <= 1
 order by AvgRating desc;
 
-#find classics
+#find old classics
 select movie, year, avg(rating) as AvgRating
-from Movie M, Time_Movie_Xref TM, Time T, Rating_Movie_Xref RM
-where TM.movieid = M.id and T.ID = TM.timeid and RM.movieid=M.id and year < 1980
+from Movie M
+inner join Time_Movie_Xref TM on TM.movieid = M.id
+inner join Time T on T.id=TM.timeid
+inner join Rating_Movie_Xref RM on RM.movieid = M.id
+where year < 1980
 group by movie, year
-having AvgRating >= 4
+having AvgRating > 4
 order by AvgRating desc;
 
 #count ratings per user
 select firstname, lastname, count(ratingmovieid) as NumRatings
-from User_RatingMovie_Xref UR, User U
-where UR.userid = U.id
+from User_RatingMovie_Xref UR
+inner join User U on UR.userid = U.id
 group by firstname, lastname;
 
+#data on users who rate on average above 4.5 stars
+select firstname, lastname, avg(rating) AvgRating, count(ratingmovieid) NumRatings
+from User_RatingMovie_Xref UR
+inner join User U on UR.userid = U.id
+inner join Rating_Movie_Xref RM on RM.id = UR.ratingmovieid
+group by firstname, lastname
+having AvgRating >= 4.5;
 
+#data on users who rate on average below 2 stars
+select firstname, lastname, avg(rating) AvgRating, count(ratingmovieid) NumRatings
+from User_RatingMovie_Xref UR
+inner join User U on UR.userid = U.id
+inner join Rating_Movie_Xref RM on RM.id = UR.ratingmovieid
+group by firstname, lastname
+having AvgRating < 2;
 
-
-
+#find dark movies
+select movie, tag, avg(rating) AvgRating
+from Movie M
+inner join Tag_Movie_Xref TM on TM.movieid = M.id
+inner join Tag T on T.id = TM.tagid
+inner join Rating_Movie_Xref RM on RM.movieid = M.id
+where tag like '%dark%'
+group by movie, tag
+order by AvgRating desc;
 
 #Best action movies of the 90's
 select movie, year, avg(rating) as AvgRating, genre
-from Movie M, Time_Movie_Xref TM, Time T, Rating_Movie_Xref RM, Genre G, Genre_Movie_Xref GM
-where TM.movieid = M.id and T.ID = TM.timeid and RM.movieid=M.id and G.id=GM.GenreId and (year > 1989 and year < 2000) and G.genre like '%action%'
+from Movie M
+inner join Time_Movie_Xref TM on M.id = TM.movieid
+inner join Time T on TM.timeid = T.id
+inner join Rating_Movie_Xref RM on RM.movieid = M.id
+inner join Genre_Movie_Xref GM on GM.movieid = M.id
+inner join Genre G on G.id = GM.genreid
+where (year > 1989 and year < 2000) and G.genre like '%action%'
 group by movie, year
 having AvgRating >=4.5
 order by AvgRating desc;
 
 #Best Drama movies of the 80's
 select movie, year, avg(rating) as AvgRating, genre
-from Movie M, Time_Movie_Xref TM, Time T, Rating_Movie_Xref RM, Genre G, Genre_Movie_Xref GM
-where TM.movieid = M.id and T.ID = TM.timeid and RM.movieid=M.id and G.id=GM.GenreId and (year > 1979 and year < 1990) and G.genre like '%drama%'
+from Movie M
+inner join Time_Movie_Xref TM on M.id = TM.movieid
+inner join Time T on T.id = TM.timeid
+inner join Rating_Movie_Xref RM on RM.movieid = M.id
+inner join Genre_Movie_Xref GM on GM.movieid = M.id
+inner join Genre G on G.id = GM.genreid
+where (year > 1979 and year < 1990) and G.genre like '%drama%'
 group by movie, year
 having AvgRating >=4.5
 order by AvgRating desc;
 
 #Worst all time films
 select movie, avg(rating) as AvgRating
-from Movie M, Time_Movie_Xref TM, Time T, Rating_Movie_Xref RM
-where TM.movieid = M.id and RM.movieid=M.id
+from Movie M
+inner join Rating_Movie_Xref RM on RM.movieid = M.id
 group by movie
 having AvgRating <= 1
 order by AvgRating desc;
