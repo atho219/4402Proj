@@ -92,3 +92,43 @@ inner join Rating_Movie_Xref RM on RM.movieid = M.id
 group by movie
 having AvgRating <= 1
 order by AvgRating desc;
+
+#Best movies of all time
+select movie, avg(rating) as AvgRating
+from Movie M
+inner join Rating_Movie_Xref RM on RM.movieid = M.id
+group by movie
+having AvgRating >= 4.75
+order by AvgRating desc;
+
+#Best recent movies
+select movie, avg(rating) as AvgRating, year
+from Movie M
+inner join Time_Movie_Xref TM on M.id = TM.movieid
+inner join Time T on T.id = TM.timeid
+inner join Rating_Movie_Xref RM on RM.movieid = M.id
+where (year > 2010) 
+group by movie, year
+having AvgRating >= 4.5
+order by AvgRating desc, year desc;
+
+#find Brad Pitt movies 
+select movie, avg(rating) as AvgRating, tag as Actor
+from Movie M
+inner join Tag_Movie_Xref TM on TM.movieid= M.id
+inner join Tag T on T.id = TM.tagid
+inner join Rating_Movie_Xref RM on RM.movieid = M.id
+where T.tag like '%Brad Pitt%' 
+group by movie
+order by AvgRating desc, movie;
+
+#Most overrated movies (highest rated overrated movies)
+select movie, avg(rating) as AvgRating
+from Movie M
+inner join Tag_Movie_Xref TM on TM.movieid= M.id
+inner join Tag T on T.id = TM.tagid
+inner join Rating_Movie_Xref RM on RM.movieid = M.id
+where T.tag like '%Overrated%'
+group by movie
+having AvgRating >=3
+order by AvgRating desc;
