@@ -27,3 +27,32 @@ select firstname, lastname, count(ratingmovieid) as NumRatings
 from User_RatingMovie_Xref UR, User U
 where UR.userid = U.id
 group by firstname, lastname;
+
+
+
+
+
+
+#Best action movies of the 90's
+select movie, year, avg(rating) as AvgRating, genre
+from Movie M, Time_Movie_Xref TM, Time T, Rating_Movie_Xref RM, Genre G, Genre_Movie_Xref GM
+where TM.movieid = M.id and T.ID = TM.timeid and RM.movieid=M.id and G.id=GM.GenreId and (year > 1989 and year < 2000) and G.genre like '%action%'
+group by movie, year
+having AvgRating >=4.5
+order by AvgRating desc;
+
+#Best Drama movies of the 80's
+select movie, year, avg(rating) as AvgRating, genre
+from Movie M, Time_Movie_Xref TM, Time T, Rating_Movie_Xref RM, Genre G, Genre_Movie_Xref GM
+where TM.movieid = M.id and T.ID = TM.timeid and RM.movieid=M.id and G.id=GM.GenreId and (year > 1979 and year < 1990) and G.genre like '%drama%'
+group by movie, year
+having AvgRating >=4.5
+order by AvgRating desc;
+
+#Worst all time films
+select movie, avg(rating) as AvgRating
+from Movie M, Time_Movie_Xref TM, Time T, Rating_Movie_Xref RM
+where TM.movieid = M.id and RM.movieid=M.id
+group by movie
+having AvgRating <= 1
+order by AvgRating desc;
