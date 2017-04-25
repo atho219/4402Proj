@@ -1,22 +1,6 @@
-#VIEWS
-#1
-CREATE VIEW `all_movies` AS select `Movie`.`Id` AS `Id`,`Movie`.`Movie` AS `Movie Name` from `Movie`;
-
-#2
-CREATE VIEW `movies_with_genre` AS select `m`.`Id` AS `id`,`m`.`Movie` AS `Movie Name`,group_concat(`g`.`Genre` separator ',') AS `Genre` from ((`Movie` `m` join `Genre_Movie_Xref` `x1` on((`x1`.`MovieId` = `m`.`Id`))) join `Genre` `g` on((`g`.`Id` = `x1`.`GenreId`))) group by `m`.`Id`;
-
-#3
-CREATE VIEW `movie_average_rating` AS select `m`.`Id` AS `id`,`m`.`Movie` AS `Movie Name`,avg(`x`.`Rating`) AS `Average Rating` from (`Movie` `m` join `Rating_Movie_Xref` `x` on((`x`.`MovieId` = `m`.`Id`))) group by `m`.`Id`;
-
-#4
-CREATE VIEW `movie_with_tags` AS select `m`.`Id` AS `id`,`m`.`Movie` AS `Movie Name`,group_concat(`t`.`Tag` separator ',') AS `Tags` from ((`Movie` `m` join `Tag_Movie_Xref` `x1` on((`x1`.`MovieId` = `m`.`Id`))) join `Tag` `t` on((`t`.`Id` = `x1`.`TagId`))) group by `m`.`Id`;
-
-#5
-CREATE VIEW `movie_with_year` AS select `m`.`Id` AS `id`,`m`.`Movie` AS `Movie Name`,group_concat(`t`.`Year` separator ',') AS `Year` from ((`Movie` `m` join `Time_Movie_Xref` `x1` on((`x1`.`MovieId` = `m`.`Id`))) join `Time` `t` on((`t`.`Id` = `x1`.`TimeId`))) group by `m`.`Id`;
-
 #QUERIES
 #select all comedies
-select distinct movie
+select movie
 from Movie M
 inner join Genre_Movie_Xref GM on GM.movieid = M.id
 inner join Genre G on G.id = GM.genreid
